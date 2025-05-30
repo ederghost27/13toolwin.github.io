@@ -27,7 +27,7 @@ Truy cập: http://localhost:3000
 
 ### 2. Demo trên GitHub Pages
 
-Truy cập: https://13toolwin.github.io
+Truy cập: https://ederghost27.github.io/13toolwin.github.io
 
 *Phiên bản demo sử dụng localStorage để lưu trữ dữ liệu*
 
@@ -132,5 +132,5 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 📞 Liên hệ
 
-- GitHub: [@13toolwin](https://github.com/13toolwin)
-- Project Link: [https://github.com/13toolwin/13toolwin.github.io](https://github.com/13toolwin/13toolwin.github.io)
+- GitHub: [@ederghost27](https://github.com/ederghost27)
+- Project Link: [https://github.com/ederghost27/13toolwin.github.io](https://github.com/ederghost27/13toolwin.github.io)

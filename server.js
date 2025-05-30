@@ -69,39 +69,69 @@ function writeDatabase(data) {
 
 // Parse account file
 function parseAccountFile(fileContent) {
+  console.log('Parsing file content, length:', fileContent.length);
   const accounts = [];
   const lines = fileContent.split('\n');
 
   let currentAccount = {};
 
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     const trimmedLine = line.trim();
 
-    if (trimmedLine.startsWith('Tài khoản:')) {
-      // Start new account
-      if (currentAccount.username) {
-        accounts.push(currentAccount);
+    // Debug log
+    if (trimmedLine.includes('Tài khoản:') || trimmedLine.includes('Mật khẩu:')) {
+      console.log(`Line ${i}: "${trimmedLine}"`);
+    }
+
+    if (trimmedLine.includes('Tài khoản:')) {
+      // Save previous account if exists
+      if (currentAccount.username && currentAccount.password && currentAccount.fullName) {
+        accounts.push({...currentAccount});
+        console.log('Added account:', currentAccount.username);
       }
+
+      // Start new account
       currentAccount = {};
-      currentAccount.username = trimmedLine.replace('Tài khoản:', '').trim();
-    } else if (trimmedLine.startsWith('Mật khẩu:')) {
-      currentAccount.password = trimmedLine.replace('Mật khẩu:', '').trim();
-    } else if (trimmedLine.startsWith('Họ tên:')) {
-      currentAccount.fullName = trimmedLine.replace('Họ tên:', '').trim();
-    } else if (trimmedLine.startsWith('Trạng thái:')) {
-      currentAccount.status = trimmedLine.replace('Trạng thái:', '').trim();
-    } else if (trimmedLine.startsWith('Thưởng:')) {
-      currentAccount.reward = trimmedLine.replace('Thưởng:', '').trim();
-    } else if (trimmedLine.startsWith('Thời gian:')) {
-      currentAccount.createdAt = trimmedLine.replace('Thời gian:', '').trim();
+      const username = trimmedLine.split('Tài khoản:')[1];
+      if (username) {
+        currentAccount.username = username.trim();
+      }
+    } else if (trimmedLine.includes('Mật khẩu:')) {
+      const password = trimmedLine.split('Mật khẩu:')[1];
+      if (password) {
+        currentAccount.password = password.trim();
+      }
+    } else if (trimmedLine.includes('Họ tên:')) {
+      const fullName = trimmedLine.split('Họ tên:')[1];
+      if (fullName) {
+        currentAccount.fullName = fullName.trim();
+      }
+    } else if (trimmedLine.includes('Trạng thái:')) {
+      const status = trimmedLine.split('Trạng thái:')[1];
+      if (status) {
+        currentAccount.status = status.trim();
+      }
+    } else if (trimmedLine.includes('Thưởng:')) {
+      const reward = trimmedLine.split('Thưởng:')[1];
+      if (reward) {
+        currentAccount.reward = reward.trim();
+      }
+    } else if (trimmedLine.includes('Thời gian:')) {
+      const createdAt = trimmedLine.split('Thời gian:')[1];
+      if (createdAt) {
+        currentAccount.createdAt = createdAt.trim();
+      }
     }
   }
 
-  // Add the last account if exists
-  if (currentAccount.username) {
-    accounts.push(currentAccount);
+  // Add the last account if exists and is complete
+  if (currentAccount.username && currentAccount.password && currentAccount.fullName) {
+    accounts.push({...currentAccount});
+    console.log('Added final account:', currentAccount.username);
   }
 
+  console.log('Total accounts parsed:', accounts.length);
   return accounts;
 }
 
@@ -219,7 +249,9 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     const newAccounts = accounts.map(account => ({
       ...account,
       id: nextId++,
-      bankName: null
+      bankName: null,
+      balance: 0, // Số dư ban đầu
+      accountStatus: 'đang rãnh' // Trạng thái ban đầu
     }));
 
     data[tab] = [...tabData, ...newAccounts];
@@ -242,6 +274,12 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+// Health check endpoint for Render
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK', message: 'Server is running' });
+});
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });

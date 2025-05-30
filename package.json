@@ -2,6 +2,9 @@
   "name": "bank-account-manager",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
